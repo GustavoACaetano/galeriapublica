@@ -42,5 +42,4 @@ dependencies {
     // optional - Guava ListenableFuture support
     implementation "androidx.paging:paging-guava:$paging_version"
     implementation "androidx.paging:paging-runtime:$paging_version"
-
 }
