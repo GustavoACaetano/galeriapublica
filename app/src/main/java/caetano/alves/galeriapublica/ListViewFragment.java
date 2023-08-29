@@ -2,7 +2,15 @@ package caetano.alves.galeriapublica;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.PagingData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +31,9 @@ public class ListViewFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private MainViewModel mViewModel;
+    private View view;
 
     public ListViewFragment() {
         // Required empty public constructor
@@ -52,9 +63,27 @@ public class ListViewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
+                             @NonNull Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_view, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+         super.onViewCreated(view, savedInstanceState);
+         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+         ListAdapter listAdapter = new ListAdapter(new ImageDataComparator());
+         LiveData<PagingData<ImageData>> liveData = mViewModel.getPageLv();
+         liveData.observe(getViewLifecycleOwner(), new Observer<PagingData<ImageData>>() {
+             @Override
+             public void onChanged(PagingData<ImageData> objectPagingData) {
+                listAdapter.submitData(getViewLifecycleOwner().getLifecycle(),objectPagingData);
+             }
+         });
+
+         RecyclerView rvGallery = (RecyclerView) view.findViewById(R.id.rvList);
+         rvGallery.setAdapter(listAdapter);
+         rvGallery.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 }
